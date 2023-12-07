@@ -3,16 +3,19 @@ import sys
 
 TASK_LINK = "https://www.amazon.in/s?rh=n%3A6612025031&fs=true&ref=lp_6612025031_sar"
 
+data = []
+
 # check if CLI arguments has `-l <link>`
 # - 1 because `-l` can't be the last arg
-for i in len(sys.argv - 1):
+for i in range(len(sys.argv) - 1):
     if sys.argv[i] == "-l":
         data = scrape(sys.argv[i])
 else:
     data = scrape(TASK_LINK)
 
-"""
-"""
+print(data)
+
+# convert the data to CSV
 
 """
 NOTE:
