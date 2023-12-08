@@ -7,3 +7,7 @@ lib*
 share
 
 test.html
+out/*
+# just to make sure out doesn't get ignored itself
+!out
+!out/.gitkeep

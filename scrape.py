@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import re
+import subprocess
 
 # some selectors
 CONTAINER = ".s-main-slot.s-result-list.s-search-results"
@@ -24,7 +25,7 @@ def scrape(link: str):
     output = []
 
     options = webdriver.FirefoxOptions()
-    # options.add_argument("-headless")
+    options.add_argument("-headless")
 
     driver = webdriver.Firefox(options=options)
 
@@ -53,10 +54,13 @@ def scrape(link: str):
                 "(.*) out of 5 stars", item.select_one(RATING_SELECTOR).text
             ).groups()[0]
         )
+        # we need to strip the price because there are commas
+        price = item.select_one(PRICE_SELECTOR).text
+        price = float(price.replace(",", ""))
         # object that will be appended to `output`
         obj = {
             "Name": item.select_one(NAME_SELECTOR).text,
-            "Price": item.select_one(PRICE_SELECTOR).text,
+            "Price": price,
             "Rating": rating,
             "Seller": None,
         }
@@ -64,7 +68,6 @@ def scrape(link: str):
         # using selenium again here
         # in order to get the name of the seller
         # (which isn't displayed in the listing page)
-
         if item.select_one(UNAVAILABLE_SELECTOR) != None:
             output.append(obj)
             continue
@@ -77,10 +80,10 @@ def scrape(link: str):
         merchant_element = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "#merchant-info a"))
         )
-        # this time not sleeping is okay since we aren't aiming for a container
+        time.sleep(1)
+
         obj["Seller"] = merchant_element.get_attribute("innerText")
         output.append(obj)
-        print(obj)
 
     # finally quit the driver
     driver.quit()

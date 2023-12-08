@@ -1,5 +1,7 @@
 from scrape import scrape
 import sys
+from datetime import datetime
+import csv
 
 TASK_LINK = "https://www.amazon.in/s?rh=n%3A6612025031&fs=true&ref=lp_6612025031_sar"
 
@@ -10,12 +12,20 @@ data = []
 for i in range(len(sys.argv) - 1):
     if sys.argv[i] == "-l":
         data = scrape(sys.argv[i])
+        break
 else:
     data = scrape(TASK_LINK)
 
-print(data)
 
 # convert the data to CSV
+output_path = f"./out/data-{datetime.now().strftime('%Y-%m-%d_%H.%M.%S')}.csv"
+
+with open(output_path, 'w', newline='') as file:
+    writer = csv.DictWriter(file, fieldnames=data[0].keys())
+    writer.writeheader()
+
+    for entry in data:
+        writer.writerow(entry)
 
 """
 NOTE:
